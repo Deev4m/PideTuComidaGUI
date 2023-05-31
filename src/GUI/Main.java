@@ -4,6 +4,9 @@
  */
 package GUI;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.pidetucomida.gui.pojo.Pedido;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -11,9 +14,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -21,7 +29,8 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class Main extends javax.swing.JFrame {
 
-    String url = "http://localhost:8080/PideTuComidaAPI/resources/api/productos";
+    String url = "http://localhost:8080/PideTuComidaAPI/resources/api/pedidos";
+    Timer timer;
 
     /**
      * Creates new form Main
@@ -30,6 +39,10 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         estiloTabla();
         mostrarPedidosEnTabla(url);
+
+        // Iniciar el timer para actualizar la tabla en tiempo real
+        timer = new Timer();
+        timer.schedule(new actualizarTablaTask(), 0, 5000); // Actualizar cada 5 segundos
     }
 
     public void estiloTabla() {
@@ -53,7 +66,9 @@ public class Main extends javax.swing.JFrame {
         jTable1.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) { // Verificar si se hizo doble clic
-                    DetallesPedido detallesPedido = new DetallesPedido();
+                    int filaSeleccionada = jTable1.getSelectedRow();
+                    int idPedido = (int) jTable1.getValueAt(filaSeleccionada, 0);
+                    DetallesPedido detallesPedido = new DetallesPedido(idPedido);
                     detallesPedido.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Configurar el comportamiento de cierre
                     detallesPedido.setVisible(true);
                 }
@@ -64,33 +79,70 @@ public class Main extends javax.swing.JFrame {
         jTable1.setFillsViewportHeight(true);
     }
 
-    private static String mostrarPedidosEnTabla(String url) {
-        // Esto es lo que vamos a devolver
-        StringBuilder resultado = new StringBuilder();
+    public void mostrarPedidosEnTabla(String url) {
         try {
-            // Crear un objeto de tipo URL
             URL direccion = new URL(url);
-
-            // Abrir la conexión e indicar que será de tipo GET
             HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
-            // Búferes para leer
             BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            StringBuilder resultado = new StringBuilder();
             String linea;
-
-            // Mientras el BufferedReader se pueda leer, agregar contenido a resultado
             while ((linea = rd.readLine()) != null) {
                 resultado.append(linea);
             }
-
-            // Cerrar el BufferedReader
             rd.close();
+            // Obtener el modelo de la tabla
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+
+            // Limpiar la tabla antes de agregar nuevos datos
+            model.setRowCount(0);
+
+            // Obtener el resultado como cadena JSON
+            String json = resultado.toString();
+
+            // Usar Jackson para parsear el JSON en una lista de objetos Pedido
+            Gson gson = new Gson();
+            ArrayList<Pedido> pedidos = gson.fromJson(json, new TypeToken<ArrayList<Pedido>>() {
+            }.getType());
+
+            // Recorrer la lista de pedidos y agregar filas a la tabla
+            for (Pedido p : pedidos) {
+                model.addRow(new Object[]{
+                    p.getId(),
+                    p.getFechaPedido(),
+                    p.getComentario(),
+                    p.getFormaDePago()
+                });
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // Regresar resultado, pero como cadena, no como StringBuilder
-        return resultado.toString();
+    }
+
+    public void eliminarPedidoDeTabla(int idPedido) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        int rowCount = model.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            int id = (int) model.getValueAt(i, 0); // Suponiendo que la columna 0 contiene el ID del pedido
+            if (id == idPedido) {
+                model.removeRow(i);
+                break;
+            }
+        }
+    }
+
+    // Subclase para actualizar la tabla en 'tiempo real'
+    private class actualizarTablaTask extends TimerTask {
+
+        @Override
+        public void run() {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    mostrarPedidosEnTabla(url);
+                }
+            });
+        }
     }
 
     /**
@@ -113,11 +165,11 @@ public class Main extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Número Pedido", "Fecha", "Cliente", "Dirección", "Teléfono"
+                "Número Pedido", "Fecha", "Comentario", "Forma de pago"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -139,21 +191,21 @@ public class Main extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1113, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButtonCerrar)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(540, Short.MAX_VALUE)
-                .addComponent(jButtonCerrar)
-                .addGap(526, 526, 526))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonCerrar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
