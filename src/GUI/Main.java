@@ -7,18 +7,13 @@ package GUI;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import javax.swing.JFrame;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import javax.swing.table.DefaultTableModel;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
 
 /**
  *
@@ -34,7 +29,7 @@ public class Main extends javax.swing.JFrame {
     public Main() {
         initComponents();
         estiloTabla();
-        mostrarPedidosEnTabla();
+        mostrarPedidosEnTabla(url);
     }
 
     public void estiloTabla() {
@@ -69,11 +64,33 @@ public class Main extends javax.swing.JFrame {
         jTable1.setFillsViewportHeight(true);
     }
 
-    private void mostrarPedidosEnTabla() {
+    private static String mostrarPedidosEnTabla(String url) {
+        // Esto es lo que vamos a devolver
+        StringBuilder resultado = new StringBuilder();
         try {
-            
+            // Crear un objeto de tipo URL
+            URL direccion = new URL(url);
+
+            // Abrir la conexión e indicar que será de tipo GET
+            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion.setRequestMethod("GET");
+
+            // Búferes para leer
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            String linea;
+
+            // Mientras el BufferedReader se pueda leer, agregar contenido a resultado
+            while ((linea = rd.readLine()) != null) {
+                resultado.append(linea);
+            }
+
+            // Cerrar el BufferedReader
+            rd.close();
         } catch (Exception e) {
+            e.printStackTrace();
         }
+        // Regresar resultado, pero como cadena, no como StringBuilder
+        return resultado.toString();
     }
 
     /**
