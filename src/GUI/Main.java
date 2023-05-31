@@ -63,17 +63,23 @@ public class Main extends javax.swing.JFrame {
         jTable1.setDefaultRenderer(Object.class, renderer);
 
         // Agregar el MouseAdapter para detectar el doble clic en la tabla
-        jTable1.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // Verificar si se hizo doble clic
-                    int filaSeleccionada = jTable1.getSelectedRow();
-                    int idPedido = (int) jTable1.getValueAt(filaSeleccionada, 0);
-                    DetallesPedido detallesPedido = new DetallesPedido(idPedido);
-                    detallesPedido.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Configurar el comportamiento de cierre
-                    detallesPedido.setVisible(true);
+        try {
+            jTable1.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) { // Verificar si se hizo doble clic
+                        int filaSeleccionada = jTable1.getSelectedRow();
+                        int idPedido = (int) jTable1.getValueAt(filaSeleccionada, 0);
+                        String fecha = (String) jTable1.getValueAt(filaSeleccionada, 1);
+                        String comentario = (String) jTable1.getValueAt(filaSeleccionada, 2);
+                        DetallesPedido detallesPedido = new DetallesPedido(idPedido, fecha, comentario);
+                        detallesPedido.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Configurar el comportamiento de cierre
+                        detallesPedido.setVisible(true);
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            System.out.println("");
+        }
 
         // Hacer que el JTable se ajuste al tamaño preferido
         jTable1.setFillsViewportHeight(true);
