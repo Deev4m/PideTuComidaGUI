@@ -38,7 +38,7 @@ public class Main extends javax.swing.JFrame {
     public Main() {
         initComponents();
         estiloTabla();
-        mostrarPedidosEnTabla(url);
+        mostrarPedidosEnTabla();
 
         // Iniciar el timer para actualizar la tabla en tiempo real
         timer = new Timer();
@@ -68,12 +68,14 @@ public class Main extends javax.swing.JFrame {
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) { // Verificar si se hizo doble clic
                         int filaSeleccionada = jTable1.getSelectedRow();
-                        int idPedido = (int) jTable1.getValueAt(filaSeleccionada, 0);
-                        String fecha = (String) jTable1.getValueAt(filaSeleccionada, 1);
-                        String comentario = (String) jTable1.getValueAt(filaSeleccionada, 2);
-                        DetallesPedido detallesPedido = new DetallesPedido(idPedido, fecha, comentario);
-                        detallesPedido.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Configurar el comportamiento de cierre
-                        detallesPedido.setVisible(true);
+                        if (filaSeleccionada != -1) { // Para verificar si hay una fila seleccionada y así no salta la excepción
+                            int idPedido = (int) jTable1.getValueAt(filaSeleccionada, 0);
+                            String fecha = (String) jTable1.getValueAt(filaSeleccionada, 1);
+                            String comentario = (String) jTable1.getValueAt(filaSeleccionada, 2);
+                            DetallesPedido detallesPedido = new DetallesPedido(idPedido, fecha, comentario);
+                            detallesPedido.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Configurar el comportamiento de cierre
+                            detallesPedido.setVisible(true);
+                        }
                     }
                 }
             });
@@ -85,7 +87,7 @@ public class Main extends javax.swing.JFrame {
         jTable1.setFillsViewportHeight(true);
     }
 
-    public void mostrarPedidosEnTabla(String url) {
+    public void mostrarPedidosEnTabla() {
         try {
             URL direccion = new URL(url);
             HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
@@ -145,7 +147,7 @@ public class Main extends javax.swing.JFrame {
         public void run() {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    mostrarPedidosEnTabla(url);
+                    mostrarPedidosEnTabla();
                 }
             });
         }
@@ -163,6 +165,7 @@ public class Main extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButtonCerrar = new javax.swing.JButton();
+        jButtonAddProducto = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -193,18 +196,27 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
+        jButtonAddProducto.setText("Añadir producto");
+        jButtonAddProducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAddProductoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1113, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButtonCerrar)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1113, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(229, 229, 229)
+                .addComponent(jButtonAddProducto)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButtonCerrar)
+                .addGap(236, 236, 236))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -212,7 +224,9 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButtonCerrar)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonCerrar)
+                    .addComponent(jButtonAddProducto))
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -222,6 +236,11 @@ public class Main extends javax.swing.JFrame {
     private void jButtonCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCerrarActionPerformed
         System.exit(0);
     }//GEN-LAST:event_jButtonCerrarActionPerformed
+
+    private void jButtonAddProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddProductoActionPerformed
+        AddProducto addProducto = new AddProducto();
+        addProducto.setVisible(true);
+    }//GEN-LAST:event_jButtonAddProductoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -260,6 +279,7 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonAddProducto;
     private javax.swing.JButton jButtonCerrar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
