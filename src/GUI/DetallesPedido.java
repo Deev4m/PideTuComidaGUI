@@ -5,10 +5,18 @@
 package GUI;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.pidetucomida.gui.pojo.Cliente;
+import com.pidetucomida.gui.pojo.Pedido;
+import com.pidetucomida.gui.pojo.Producto;
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import javax.swing.DefaultListModel;
+import javax.swing.ListModel;
 
 /**
  *
@@ -16,7 +24,7 @@ import java.net.URL;
  */
 public class DetallesPedido extends javax.swing.JFrame {
 
-    String urlDetallesPedido = "http://localhost:8080/PideTuComidaAPI/resources/api//pedidos/detalles_pedido/";
+    String urlDetallesPedido = "http://localhost:8080/PideTuComidaAPI/resources/api/pedidos/detalles_pedido/";
     String urlFinalizar = "http://localhost:8080/PideTuComidaAPI/resources/api/pedidos/finalizarPedido/";
 
     int idPedido;
@@ -31,16 +39,31 @@ public class DetallesPedido extends javax.swing.JFrame {
         this.idPedido = idPedido;
         this.fecha = fecha;
         this.comentario = comentario;
+
+        estilo();
+
+        // Obtener los detalles del cliente y mostrarlos en los campos
+        mostrarDetallesCliente();
+    }
+
+    public void estilo() {
         jTextFieldIdPedido.setText(String.valueOf(idPedido)); // Establecer el ID del pedido en el JTextFieldIdPedido
         jTextFieldFechaHora.setText(String.valueOf(fecha));
-
-        // Establecer el texto y el tamaño preferido para el campo de comentario
         jTextAreaComentario.setText(String.valueOf(comentario));
         jTextAreaComentario.setLineWrap(true);
         jTextAreaComentario.setWrapStyleWord(true);
 
-        // Obtener los detalles del pedido y mostrarlos en los campos
-        mostrarDetallesCliente();
+        setLocationRelativeTo(null); // Se abre en el centro siempre
+        getContentPane().setBackground(Color.decode("#014B10"));
+        jLabel1.setForeground(Color.WHITE);
+        jLabel2.setForeground(Color.WHITE);
+        jLabel3.setForeground(Color.WHITE);
+        jLabel4.setForeground(Color.WHITE);
+        jLabel5.setForeground(Color.WHITE);
+        jLabel6.setForeground(Color.WHITE);
+        jLabel7.setForeground(Color.WHITE);
+        jLabel8.setForeground(Color.WHITE);
+
     }
 
     public DetallesPedido() {
@@ -64,11 +87,48 @@ public class DetallesPedido extends javax.swing.JFrame {
 
             // Obtener el resultado como cadena JSON
             String json = resultado.toString();
-
-            // Usar Jackson o Gson para parsear el JSON en un objeto DetallesPedido
             Gson gson = new Gson();
-            DetallesPedido detalles = gson.fromJson(json, DetallesPedido.class);
+            Cliente c = gson.fromJson(json, Cliente.class);
 
+            jTextFieldNombre.setText(c.getNombre());
+            jTextFieldCorreo.setText(c.getCorreo());
+            jTextFieldDireccion.setText(c.getDireccionEnvio());
+            jTextFieldTelefono.setText(c.getTelefono());
+
+            mostrarProductosDelPedido();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void mostrarProductosDelPedido() {
+        try {
+            URL direccion = new URL(urlDetallesPedido + idPedido + "/productos");
+            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion.setRequestMethod("GET");
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            StringBuilder resultado = new StringBuilder();
+            String linea;
+            while ((linea = rd.readLine()) != null) {
+                resultado.append(linea);
+            }
+            rd.close();
+
+            // Crear el modelo de lista
+            DefaultListModel<String> listModel = new DefaultListModel<>();
+
+            // Obtener el resultado como cadena JSON
+            String json = resultado.toString();
+            Gson gson = new Gson();
+            ArrayList<Producto> productos = gson.fromJson(json, new TypeToken<ArrayList<Producto>>() {
+            }.getType());
+
+            // Recorrer la lista de productos y agregar nombres a la lista
+            for (Producto p : productos) {
+                listModel.addElement(p.getNombre()); // Agregar el nombre del producto a la lista
+            }
+            jListProductos.setModel(listModel); // Establecer el modelo de lista en el JList
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -102,8 +162,10 @@ public class DetallesPedido extends javax.swing.JFrame {
         jListProductos = new javax.swing.JList<>();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextAreaComentario = new javax.swing.JTextArea();
+        jLabel8 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         jButtonAtras.setText("Atrás");
         jButtonAtras.addActionListener(new java.awt.event.ActionListener() {
@@ -138,7 +200,7 @@ public class DetallesPedido extends javax.swing.JFrame {
 
         jTextFieldFechaHora.setEditable(false);
 
-        jLabel7.setText("Comentario");
+        jLabel7.setText("Comentarios");
 
         jScrollPane1.setViewportView(jListProductos);
 
@@ -147,49 +209,49 @@ public class DetallesPedido extends javax.swing.JFrame {
         jTextAreaComentario.setRows(5);
         jScrollPane3.setViewportView(jTextAreaComentario);
 
+        jLabel8.setText("Productos");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jTextFieldCorreo, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                                    .addComponent(jTextFieldNombre)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(27, 27, 27)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jTextFieldTelefono, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextFieldDireccion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))))))
-                .addGap(93, 93, 93)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextFieldIdPedido, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextFieldFechaHora, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLabel7)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGap(236, 236, 236)
-                .addComponent(jButtonAtras)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButtonFinalizar)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4))
+                                .addGap(27, 27, 27)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jTextFieldTelefono, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jTextFieldDireccion, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jTextFieldCorreo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jTextFieldNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel8)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 120, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel5))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jTextFieldIdPedido, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextFieldFechaHora, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel7)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(236, 236, 236)
+                        .addComponent(jButtonAtras)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonFinalizar)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -218,9 +280,11 @@ public class DetallesPedido extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
                             .addComponent(jTextFieldTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(5, 5, 5)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -283,6 +347,7 @@ public class DetallesPedido extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JList<String> jListProductos;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;

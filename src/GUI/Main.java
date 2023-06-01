@@ -47,7 +47,7 @@ public class Main extends javax.swing.JFrame {
 
     public void estiloTabla() {
         setTitle("Gestor de pedidos - Pide Tu Comida");
-
+        setLocationRelativeTo(null); // Se abre en el centro siempre
         // Cambiar el color de fondo a #014B10
         getContentPane().setBackground(Color.decode("#014B10"));
 
@@ -107,7 +107,7 @@ public class Main extends javax.swing.JFrame {
             // Obtener el resultado como cadena JSON
             String json = resultado.toString();
 
-            // Usar Jackson para parsear el JSON en una lista de objetos Pedido
+            // Usar Gson para parsear el JSON en una lista de objetos Pedido
             Gson gson = new Gson();
             ArrayList<Pedido> pedidos = gson.fromJson(json, new TypeToken<ArrayList<Pedido>>() {
             }.getType());
@@ -165,6 +165,8 @@ public class Main extends javax.swing.JFrame {
         jButtonCerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setResizable(false);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
