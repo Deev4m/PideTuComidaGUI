@@ -69,7 +69,7 @@ public class DetallesPedido extends javax.swing.JFrame {
         setTitle("Detalles del pedido");
     }
 
-    private synchronized void mostrarDetallesCliente() {
+    public synchronized void mostrarDetallesCliente() {
         try {
             URL direccion = new URL(urlDetallesPedido + idPedido);
             HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
@@ -99,7 +99,7 @@ public class DetallesPedido extends javax.swing.JFrame {
         }
     }
 
-    private void mostrarProductosDelPedido() {
+    public void mostrarProductosDelPedido() {
         try {
             URL direccion = new URL(urlDetallesPedido + idPedido + "/productos");
             HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();

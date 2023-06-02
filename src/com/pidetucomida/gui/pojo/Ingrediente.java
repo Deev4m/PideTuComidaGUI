@@ -9,12 +9,17 @@ package com.pidetucomida.gui.pojo;
  * @author dev
  */
 public class Ingrediente {
+
     private int idIngrediente;
     private String nombre;
 
     public Ingrediente(int idIngrediente, String nombre) {
         this.idIngrediente = idIngrediente;
         this.nombre = nombre;
+    }
+
+    public Ingrediente() {
+
     }
 
     public int getIdIngrediente() {
@@ -32,5 +37,5 @@ public class Ingrediente {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-    
+
 }

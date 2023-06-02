@@ -15,7 +15,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -24,16 +23,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author dev
  */
-public class AddProducto extends javax.swing.JFrame {
+public class AddProducto1 extends javax.swing.JFrame {
 
     String urlInsertarProducto = "http://localhost:8080/PideTuComidaAPI/resources/api/productos/insert";
-    String urlInsertarIngredientes = "http://localhost:8080/PideTuComidaAPI/resources/api/ingredientesInsert";
+    String urlInsertarIngrediente = "http://localhost:8080/PideTuComidaAPI/resources/api/ingredientesInsert";
     String urlVerificarIngrediente = "http://localhost:8080/PideTuComidaAPI/resources/api/ingredientesVerificar/";
 
     /**
      * Creates new form AddProducto
      */
-    public AddProducto() {
+    public AddProducto1() {
         initComponents();
         estilo();
     }
@@ -226,21 +225,6 @@ public class AddProducto extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Campos incompletos", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        agregarProducto(rutaImagen, nombreProducto, precioProducto, tipoSeleccionado, ingredientes, descripcion);
-
-        // Limpiar los campos después de la inserción
-        jTextFieldRutaImagen.setText("");
-        jTextFieldNombreProducto.setText("");
-        jTextFieldPrecioProducto.setText("");
-        jComboBoxSeleccionableTipo.setSelectedIndex(0);
-        jTextFieldIngredientes.setText("");
-        jTextAreaDescripcion.setText("");
-
-        agregarIngredientes(ingredientes);
-    }//GEN-LAST:event_jButtonAceptarActionPerformed
-
-    public void agregarProducto(String rutaImagen, String nombreProducto, String precioProducto, String tipoSeleccionado, String ingredientes, String descripcion) {
         try {
             // Leer la imagen y convertirla en un arreglo de bytes
             File fichero = new File(rutaImagen);//digo que fichero es y directorio
@@ -292,60 +276,75 @@ public class AddProducto extends javax.swing.JFrame {
             } else {
                 System.out.println("Error en la solicitud. Código de respuesta: " + responseCode);
             }
+
             conexion.disconnect();
+
+            // Limpiar los campos después de la inserción
+            jTextFieldRutaImagen.setText("");
+            jTextFieldNombreProducto.setText("");
+            jTextFieldPrecioProducto.setText("");
+            jComboBoxSeleccionableTipo.setSelectedIndex(0);
+            jTextFieldIngredientes.setText("");
+            jTextAreaDescripcion.setText("");
+
+            agregarIngredientes();
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Debe poner un número en 'Precio'. (Ejemplo: 10.20)", "Formato erróneo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Debe poner un número en Precio. (Ejemplo: 10.20)", "Formato erróneo", JOptionPane.WARNING_MESSAGE);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }//GEN-LAST:event_jButtonAceptarActionPerformed
 
-    public void agregarIngredientes(String ingredientes) {
-        // Lechuga, toMate,      ceboLLA, aguaCate, huevo frito, queso
+    public void agregarIngredientes() {
+        String ingredientes = jTextFieldIngredientes.getText();
 
         try {
-            URL direccion = new URL(urlInsertarIngredientes);
+            URL direccion = new URL(urlInsertarIngrediente);
             HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("POST");
             conexion.setDoOutput(true);
             conexion.setRequestProperty("Content-Type", "application/json");
 
             Gson gson = new Gson();
+
             String[] ingredientesArray = ingredientes.split(",");
-            ArrayList<Ingrediente> listaIngredientes = new ArrayList<>();
-
             for (String i : ingredientesArray) {
-                Ingrediente in = new Ingrediente();
-                in.setNombre(primeraLetraMayuscula(i.trim()));
-                listaIngredientes.add(in);
-            }
-
-            // Convertir la lista de ingredientes a JSON
-            String jsonIngredientes = gson.toJson(listaIngredientes);
-
-            // Escribir los datos en la conexión y enviarlos al servidor
-            try (OutputStream outputStream = conexion.getOutputStream()) {
-                byte[] input = jsonIngredientes.getBytes("utf-8");
-                outputStream.write(input, 0, input.length);
-            }
-
-            // Obtener la respuesta del servidor
-            int responseCode = conexion.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Los ingredientes se insertaron correctamente
-                String response = "";
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response += line;
-                    }
+                System.out.println(i);
+                // Verificar si el ingrediente ya existe en la base de datos
+                if (verificarIngredienteExistente(i.trim())) {
+                    System.out.println("El ingrediente ya existe en la base de datos: " + i.trim());
+                    continue;
                 }
-                System.out.println("Respuesta del servidor: " + response);
-            } else {
-                System.out.println("AGREGAR - Error en la solicitud. Código de respuesta: " + responseCode);
-            }
 
-            conexion.disconnect();
+                // Crear un objeto Ingrediente y convertirlo a JSON
+                Ingrediente in = new Ingrediente();
+                in.setNombre(primeraLetraMayuscula(i.trim())); // Eliminar espacios en blanco al inicio y al final del ingrediente
+                String jsonIngrediente = gson.toJson(in);
+                
+
+                try (OutputStream outputStream = conexion.getOutputStream()) {
+                    byte[] input = jsonIngrediente.getBytes("utf-8");
+                    outputStream.write(input, 0, input.length);
+                }
+
+                // Obtener la respuesta del servidor
+                int responseCode = conexion.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // El ingrediente se insertó correctamente
+                    String response = "";
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            response += line;
+                        }
+                    }
+                    System.out.println("Respuesta del servidor: " + response);
+                } else {
+                    System.out.println("AGREGAR - Error en la solicitud1. Código de respuesta: " + responseCode);
+                }
+
+                conexion.disconnect();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -379,15 +378,11 @@ public class AddProducto extends javax.swing.JFrame {
         return false;
     }
 
-    public static String primeraLetraMayuscula(String ingrediente) {
-        if (ingrediente == null || ingrediente.isEmpty()) {
-            return "";
+    public String primeraLetraMayuscula(String letra) {
+        if (letra == null || letra.isEmpty()) {
+            return letra;
         }
-
-        String ingredienteFormateado = ingrediente.trim();
-        ingredienteFormateado = ingredienteFormateado.substring(0, 1).toUpperCase() + ingredienteFormateado.substring(1).toLowerCase();
-
-        return ingredienteFormateado;
+        return letra.substring(0, 1).toUpperCase() + letra.substring(1);
     }
 
     /**
@@ -407,20 +402,21 @@ public class AddProducto extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AddProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddProducto1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AddProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddProducto1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AddProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddProducto1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AddProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddProducto1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AddProducto().setVisible(true);
+                new AddProducto1().setVisible(true);
             }
         });
     }
