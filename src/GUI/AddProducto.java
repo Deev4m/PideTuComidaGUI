@@ -5,8 +5,8 @@
 package GUI;
 
 import com.google.gson.Gson;
-import com.pidetucomida.pojo.Ingrediente;
-import com.pidetucomida.pojo.Producto;
+import com.pidetucomida.pojo.gui.Ingrediente;
+import com.pidetucomida.pojo.gui.Producto;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;

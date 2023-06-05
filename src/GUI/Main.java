@@ -6,7 +6,7 @@ package GUI;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.pidetucomida.pojo.Pedido;
+import com.pidetucomida.pojo.gui.Pedido;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

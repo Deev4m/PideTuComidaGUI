@@ -6,8 +6,8 @@ package GUI;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.pidetucomida.pojo.Cliente;
-import com.pidetucomida.pojo.Producto;
+import com.pidetucomida.pojo.gui.Cliente;
+import com.pidetucomida.pojo.gui.Producto;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
