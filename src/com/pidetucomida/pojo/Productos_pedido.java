@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.pidetucomida.gui.pojo;
+package com.pidetucomida.pojo;
 
 /**
  *
  * @author dev
  */
 public class Productos_pedido {
+
     private int id;
     private int idPedido;
     private int idProducto;
     private int cantidad;
-    private double precio;
 
     public Productos_pedido() {
     }
@@ -23,15 +23,6 @@ public class Productos_pedido {
         this.idPedido = idPedido;
         this.idProducto = idProducto;
         this.cantidad = cantidad;
-        this.precio = precio;
-    }
-
-    public double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(double precio) {
-        this.precio = precio;
     }
 
     public int getId() {
@@ -64,6 +55,11 @@ public class Productos_pedido {
 
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
+    }
+
+    @Override
+    public String toString() {
+        return "Productos_pedido{" + "id=" + id + ", idPedido=" + idPedido + ", idProducto=" + idProducto + ", cantidad=" + cantidad + '}';
     }
     
     

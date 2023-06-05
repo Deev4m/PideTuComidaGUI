@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.pidetucomida.gui.pojo;
+package com.pidetucomida.pojo;
 
 /**
  *
@@ -21,7 +21,6 @@ public class Producto {
     public Producto() {
 
     }
-
 
     public Producto(int idProducto, String nombre, String descripcion, byte[] img, double precio, String tipo) {
         this.idProducto = idProducto;
@@ -108,5 +107,4 @@ public class Producto {
     public void setImg(byte[] img) {
         this.img = img;
     }
-
 }

@@ -5,8 +5,8 @@
 package GUI;
 
 import com.google.gson.Gson;
-import com.pidetucomida.gui.pojo.Ingrediente;
-import com.pidetucomida.gui.pojo.Producto;
+import com.pidetucomida.pojo.Ingrediente;
+import com.pidetucomida.pojo.Producto;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,9 +26,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class AddProducto extends javax.swing.JFrame {
 
-    String urlInsertarProducto = "http://localhost:8080/PideTuComidaAPI/resources/api/productos/insert";
-    String urlInsertarIngredientes = "http://localhost:8080/PideTuComidaAPI/resources/api/ingredientesInsert";
-    String urlVerificarIngrediente = "http://localhost:8080/PideTuComidaAPI/resources/api/ingredientesVerificar/";
+    String urlInsertarProducto = "http://localhost:8080/PideTuComidaServer/resources/api/productos/insert";
+    String urlInsertarIngredientes = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsert";
+    String urlVerificarIngrediente = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesVerificar/";
 
     /**
      * Creates new form AddProducto
@@ -288,7 +288,10 @@ public class AddProducto extends javax.swing.JFrame {
                         response += line;
                     }
                 }
-                System.out.println("Respuesta del servidor: " + response);
+                System.out.println("ID - Respuesta del servidor: " + response);
+
+                System.out.println("ID del Producto --->  " + p.getIdProducto());
+
             } else {
                 System.out.println("Error en la solicitud. Código de respuesta: " + responseCode);
             }
@@ -349,34 +352,6 @@ public class AddProducto extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean verificarIngredienteExistente(String ingrediente) {
-        try {
-            URL url = new URL(urlVerificarIngrediente + ingrediente);
-            HttpURLConnection conexion = (HttpURLConnection) url.openConnection();
-            conexion.setRequestMethod("GET");
-            conexion.setDoOutput(true);
-
-            // Enviar la solicitud al servidor
-            int responseCode = conexion.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Leer la respuesta del servidor
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
-                String response = reader.readLine();
-                reader.close();
-
-                // Convertir la respuesta a boolean
-                return Boolean.parseBoolean(response);
-            } else {
-                System.out.println("VERIFICAR - Error en la solicitud. Código de respuesta: " + responseCode);
-            }
-
-            conexion.disconnect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 
     public static String primeraLetraMayuscula(String ingrediente) {

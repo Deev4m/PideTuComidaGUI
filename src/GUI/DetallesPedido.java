@@ -6,8 +6,8 @@ package GUI;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.pidetucomida.gui.pojo.Cliente;
-import com.pidetucomida.gui.pojo.Producto;
+import com.pidetucomida.pojo.Cliente;
+import com.pidetucomida.pojo.Producto;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,8 +22,8 @@ import javax.swing.DefaultListModel;
  */
 public class DetallesPedido extends javax.swing.JFrame {
 
-    String urlDetallesPedido = "http://localhost:8080/PideTuComidaAPI/resources/api/pedidos/detalles_pedido/";
-    String urlFinalizar = "http://localhost:8080/PideTuComidaAPI/resources/api/pedidos/finalizarPedido/";
+    String urlDetallesPedido = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos/detalles_pedido/";
+    String urlFinalizar = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos/finalizarPedido/";
 
     int idPedido;
     String fecha, comentario;

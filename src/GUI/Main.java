@@ -6,7 +6,7 @@ package GUI;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.pidetucomida.gui.pojo.Pedido;
+import com.pidetucomida.pojo.Pedido;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Main extends javax.swing.JFrame {
 
-    String url = "http://localhost:8080/PideTuComidaAPI/resources/api/pedidos";
+    String url = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos";
     Timer timer;
 
     /**
