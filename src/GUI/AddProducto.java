@@ -13,11 +13,14 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -248,12 +251,13 @@ public class AddProducto extends javax.swing.JFrame {
     public void agregarProducto(String rutaImagen, String nombreProducto, String precioProducto, String tipoSeleccionado, String ingredientes, String descripcion) {
 
         HttpURLConnection conexion = null;
+        FileInputStream ficheroIn = null;
         try {
             // Leer la imagen y convertirla en un arreglo de bytes
             File fichero = new File(rutaImagen);//digo que fichero es y directorio
             byte[] buff = null;
             if (fichero.exists()) {
-                FileInputStream ficheroIn = new FileInputStream(fichero);//con esto leeré el fichero para convertirlo en un array de bytes
+                ficheroIn = new FileInputStream(fichero);//con esto leeré el fichero para convertirlo en un array de bytes
                 long bytes = fichero.length();//cojo la longitud del fichero
                 buff = new byte[(int) bytes];//creo un array de bytes de la misma longitud
                 int i, j = 0;//declaro variables
@@ -287,6 +291,7 @@ public class AddProducto extends javax.swing.JFrame {
             int responseCode = conexion.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 // El producto se insertó correctamente
+                JOptionPane.showMessageDialog(this, "Producto insertado correctamente", "Producto insertado", JOptionPane.WARNING_MESSAGE);
                 String response = "";
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
                     String line;
@@ -306,6 +311,13 @@ public class AddProducto extends javax.swing.JFrame {
         } finally {
             if (conexion != null) {
                 conexion.disconnect();
+            }
+            if (ficheroIn != null) {
+                try {
+                    ficheroIn.close();
+                } catch (IOException ex) {
+                    System.out.println("Error al cerrar");
+                }
             }
         }
     }

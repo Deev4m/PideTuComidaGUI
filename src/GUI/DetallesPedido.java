@@ -29,6 +29,7 @@ public class DetallesPedido extends javax.swing.JFrame {
 
     int idPedido;
     String fecha, comentario, cantidad;
+    ArrayList<Productos_pedido> cantidades;
 
     /**
      * Creates new form DetallesPedido
@@ -71,7 +72,7 @@ public class DetallesPedido extends javax.swing.JFrame {
         setTitle("Detalles del pedido");
     }
 
-    public synchronized void mostrarDetallesCliente() {
+    public void mostrarDetallesCliente() {
         try {
             URL direccion = new URL(urlDetallesPedido + idPedido);
             HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
@@ -126,40 +127,37 @@ public class DetallesPedido extends javax.swing.JFrame {
 
             mostrarCantidadProductos();
             // Recorrer la lista de productos y agregar nombres a la lista
-            for (Producto p : productos) {
-                listModel.addElement(p.getNombre() + " -> " + cantidad); // Agregar el nombre del producto a la lista
+            for (int i = 0; i < productos.size(); i++) {
+                Producto p = productos.get(i);
+                int cantidadProducto = cantidades.get(i).getCantidad();
+                listModel.addElement(p.getNombre() + " \t " + cantidadProducto);
             }
             jListProductos.setModel(listModel); // Establecer el modelo de lista en el JList
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public String mostrarCantidadProductos() {
-
+        HttpURLConnection conexion = null;
         try {
             URL direccion = new URL(urlDetallesPedido + idPedido + "/productos/cantidad");
-            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
-            StringBuilder resultado = new StringBuilder();
-            String linea;
-            while ((linea = rd.readLine()) != null) {
-                resultado.append(linea);
+            try (InputStreamReader reader = new InputStreamReader(conexion.getInputStream())) {
+                Gson gson = new Gson();
+                cantidades = gson.fromJson(reader, new TypeToken<ArrayList<Productos_pedido>>() {
+                }.getType());
+//                System.out.println("Cannnnn: " + cantidades);
             }
-
-            String json = resultado.toString();
-            Gson gson = new Gson();
-            ArrayList<Productos_pedido> cantidades = gson.fromJson(json, new TypeToken<ArrayList<Productos_pedido>>() {
-            }.getType());
-
-            for (Productos_pedido c : cantidades) {
-                cantidad = c.getCantidad() + "";
-            }
-            rd.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
         }
         return cantidad;
     }
