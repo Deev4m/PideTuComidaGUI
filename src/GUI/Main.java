@@ -42,7 +42,7 @@ public class Main extends javax.swing.JFrame {
 
         // Iniciar el timer para actualizar la tabla en tiempo real
         timer = new Timer();
-        timer.schedule(new actualizarTablaTask(), 0, 5000); // Actualizar cada 5 segundos
+        timer.schedule(new actualizarTablaTask(), 0, 2000); // Actualizar cada 5 segundos
     }
 
     public void estiloTabla() {
@@ -120,7 +120,8 @@ public class Main extends javax.swing.JFrame {
                     p.getId(),
                     p.getFechaPedido(),
                     p.getComentario(),
-                    p.getFormaDePago()
+                    p.getFormaDePago(),
+                    p.getPrecioTotal() + " €"
                 });
             }
         } catch (Exception e) {
@@ -176,11 +177,11 @@ public class Main extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Número Pedido", "Fecha", "Comentario", "Forma de pago"
+                "Número Pedido", "Fecha", "Comentario", "Forma de pago", "Total"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {

@@ -8,9 +8,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pidetucomida.pojo.gui.Cliente;
 import com.pidetucomida.pojo.gui.Producto;
+import com.pidetucomida.pojo.gui.Productos_pedido;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class DetallesPedido extends javax.swing.JFrame {
     String urlFinalizar = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos/finalizarPedido/";
 
     int idPedido;
-    String fecha, comentario;
+    String fecha, comentario, cantidad;
 
     /**
      * Creates new form DetallesPedido
@@ -122,14 +124,44 @@ public class DetallesPedido extends javax.swing.JFrame {
             ArrayList<Producto> productos = gson.fromJson(json, new TypeToken<ArrayList<Producto>>() {
             }.getType());
 
+            mostrarCantidadProductos();
             // Recorrer la lista de productos y agregar nombres a la lista
             for (Producto p : productos) {
-                listModel.addElement(p.getNombre()); // Agregar el nombre del producto a la lista
+                listModel.addElement(p.getNombre() + " -> " + cantidad); // Agregar el nombre del producto a la lista
             }
             jListProductos.setModel(listModel); // Establecer el modelo de lista en el JList
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String mostrarCantidadProductos() {
+
+        try {
+            URL direccion = new URL(urlDetallesPedido + idPedido + "/productos/cantidad");
+            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion.setRequestMethod("GET");
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            StringBuilder resultado = new StringBuilder();
+            String linea;
+            while ((linea = rd.readLine()) != null) {
+                resultado.append(linea);
+            }
+
+            String json = resultado.toString();
+            Gson gson = new Gson();
+            ArrayList<Productos_pedido> cantidades = gson.fromJson(json, new TypeToken<ArrayList<Productos_pedido>>() {
+            }.getType());
+
+            for (Productos_pedido c : cantidades) {
+                cantidad = c.getCantidad() + "";
+            }
+            rd.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return cantidad;
     }
 
     /**
@@ -173,6 +205,11 @@ public class DetallesPedido extends javax.swing.JFrame {
         });
 
         jButtonFinalizar.setText("Finalizar pedido");
+        jButtonFinalizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonFinalizarActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Nombre");
 
@@ -298,6 +335,45 @@ public class DetallesPedido extends javax.swing.JFrame {
     private void jButtonAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAtrasActionPerformed
         dispose();
     }//GEN-LAST:event_jButtonAtrasActionPerformed
+
+    private void jButtonFinalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFinalizarActionPerformed
+
+        HttpURLConnection conexion = null;
+        try {
+            URL direccion = new URL(urlFinalizar + idPedido);
+            conexion = (HttpURLConnection) direccion.openConnection();
+            conexion.setRequestMethod("POST");
+            conexion.setDoOutput(true);
+            conexion.setRequestProperty("Content-Type", "application/json");
+
+            try (OutputStream out = conexion.getOutputStream()) {
+                Gson gson = new Gson();
+                String id = gson.toJson(idPedido);
+                byte[] input = id.getBytes("utf-8");
+                out.write(input, 0, input.length);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            int respuesta = conexion.getResponseCode();
+
+            if (respuesta == HttpURLConnection.HTTP_OK) {
+                // El pedido se finalizó correctamente, ahora puedes eliminarlo de la tabla
+//                eliminarPedidoDeTabla();
+            } else {
+                // Ocurrió un error al finalizar el pedido, muestra un mensaje de error o realiza alguna acción apropiada
+            }
+            dispose();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButtonFinalizarActionPerformed
+//    public void eliminarPedidoDeTabla() {
+//        DefaultListModel<String> listModel = (DefaultListModel<String>) jListProductos.getModel();
+//        int indice = jListProductos.getSelectedIndex();
+//        listModel.remove(indice);
+//        jListProductos.setSelectedIndex(0); // Selecciona el primer elemento después de eliminar el pedido
+//    }
 
     /**
      * @param args the command line arguments

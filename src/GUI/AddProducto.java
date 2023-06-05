@@ -5,7 +5,9 @@
 package GUI;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.pidetucomida.pojo.gui.Ingrediente;
+import com.pidetucomida.pojo.gui.IngredienteProducto;
 import com.pidetucomida.pojo.gui.Producto;
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -28,7 +30,10 @@ public class AddProducto extends javax.swing.JFrame {
 
     String urlInsertarProducto = "http://localhost:8080/PideTuComidaServer/resources/api/productos/insert";
     String urlInsertarIngredientes = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsert";
+    String urlInsertarIngredientesAProducto = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsertEnProducto";
     String urlVerificarIngrediente = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesVerificar/";
+    int idProducto;
+    ArrayList<Integer> idIngredientes;
 
     /**
      * Creates new form AddProducto
@@ -241,6 +246,8 @@ public class AddProducto extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonAceptarActionPerformed
 
     public void agregarProducto(String rutaImagen, String nombreProducto, String precioProducto, String tipoSeleccionado, String ingredientes, String descripcion) {
+
+        HttpURLConnection conexion = null;
         try {
             // Leer la imagen y convertirla en un arreglo de bytes
             File fichero = new File(rutaImagen);//digo que fichero es y directorio
@@ -250,7 +257,6 @@ public class AddProducto extends javax.swing.JFrame {
                 long bytes = fichero.length();//cojo la longitud del fichero
                 buff = new byte[(int) bytes];//creo un array de bytes de la misma longitud
                 int i, j = 0;//declaro variables
-                System.out.println("Lo recorro y lo meto en un buffer");
                 while ((i = ficheroIn.read()) != -1) {//leo el fichero y lo guardo en un array de bytes
                     buff[j] = (byte) i;
                     j++;
@@ -258,7 +264,7 @@ public class AddProducto extends javax.swing.JFrame {
             }
 
             URL direccion = new URL(urlInsertarProducto);
-            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("POST");
             conexion.setDoOutput(true);
             conexion.setRequestProperty("Content-Type", "application/json");
@@ -288,27 +294,28 @@ public class AddProducto extends javax.swing.JFrame {
                         response += line;
                     }
                 }
-                System.out.println("ID - Respuesta del servidor: " + response);
-
-                System.out.println("ID del Producto --->  " + p.getIdProducto());
-
+                idProducto = Integer.parseInt(response);
+//                System.out.println("ID PRODUCTO: " + idProducto);
             } else {
-                System.out.println("Error en la solicitud. Código de respuesta: " + responseCode);
+//                System.out.println("Error en la solicitud. Código de respuesta: " + responseCode);
             }
-            conexion.disconnect();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Debe poner un número en 'Precio'. (Ejemplo: 10.20)", "Formato erróneo", JOptionPane.WARNING_MESSAGE);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
         }
     }
 
-    public void agregarIngredientes(String ingredientes) {
+    public void agregarIngredientes(String ingredientes) { // Agrego los ingredientes a la base de datos
         // Lechuga, toMate,      ceboLLA, aguaCate, huevo frito, queso
-
+        HttpURLConnection conexion = null;
         try {
             URL direccion = new URL(urlInsertarIngredientes);
-            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("POST");
             conexion.setDoOutput(true);
             conexion.setRequestProperty("Content-Type", "application/json");
@@ -335,7 +342,6 @@ public class AddProducto extends javax.swing.JFrame {
             // Obtener la respuesta del servidor
             int responseCode = conexion.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Los ingredientes se insertaron correctamente
                 String response = "";
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
                     String line;
@@ -343,14 +349,20 @@ public class AddProducto extends javax.swing.JFrame {
                         response += line;
                     }
                 }
-                System.out.println("Respuesta del servidor: " + response);
-            } else {
-                System.out.println("AGREGAR - Error en la solicitud. Código de respuesta: " + responseCode);
-            }
+                idIngredientes = gson.fromJson(response, new TypeToken<ArrayList<Integer>>() {
+                }.getType());
 
-            conexion.disconnect();
+//                System.out.println("INGREDIENTES AGREGADOS: " + response);
+            } else {
+//                System.out.println("AGREGAR - Error en la solicitud. Código de respuesta: " + responseCode);
+            }
+            agregarIngredientesAProducto();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
         }
     }
 
@@ -363,6 +375,51 @@ public class AddProducto extends javax.swing.JFrame {
         ingredienteFormateado = ingredienteFormateado.substring(0, 1).toUpperCase() + ingredienteFormateado.substring(1).toLowerCase();
 
         return ingredienteFormateado;
+    }
+
+    public void agregarIngredientesAProducto() {
+        // Lechuga, toMate,      ceboLLA, aguaCate, huevo frito, queso
+        HttpURLConnection conexion = null;
+        try {
+            URL direccion = new URL(urlInsertarIngredientesAProducto);
+            conexion = (HttpURLConnection) direccion.openConnection();
+            conexion.setRequestMethod("POST");
+            conexion.setDoOutput(true);
+            conexion.setRequestProperty("Content-Type", "application/json");
+
+            Gson gson = new Gson();
+            IngredienteProducto ip = new IngredienteProducto(idProducto, idIngredientes);
+            String jsonIngredienteProducto = gson.toJson(ip);
+
+            // Escribir los datos en la conexión y enviarlos al servidor
+            try (OutputStream outputStream = conexion.getOutputStream()) {
+                byte[] input = jsonIngredienteProducto.getBytes("utf-8");
+                outputStream.write(input, 0, input.length);
+            }
+
+            // Obtener la respuesta del servidor
+            int responseCode = conexion.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Los ingredientes se insertaron correctamente
+                String response = "";
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response += line;
+                    }
+                }
+//                System.out.println("INGREDIENTES AGREGADOS A PRODUCTO: " + idProducto);
+            } else {
+//                System.out.println("AGREGAR - Error en la solicitud. Código de respuesta: " + responseCode);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
+        }
     }
 
     /**
