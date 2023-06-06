@@ -235,22 +235,25 @@ public class AddProducto extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Campos incompletos", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        try {
+            double precio = Double.parseDouble(precioProducto);
+            agregarProducto(rutaImagen, nombreProducto, precio, tipoSeleccionado, ingredientes, descripcion);
 
-        agregarProducto(rutaImagen, nombreProducto, precioProducto, tipoSeleccionado, ingredientes, descripcion);
+            // Limpiar los campos después de la inserción
+            jTextFieldRutaImagen.setText("");
+            jTextFieldNombreProducto.setText("");
+            jTextFieldPrecioProducto.setText("");
+            jComboBoxSeleccionableTipo.setSelectedIndex(0);
+            jTextFieldIngredientes.setText("");
+            jTextAreaDescripcion.setText("");
 
-        // Limpiar los campos después de la inserción
-        jTextFieldRutaImagen.setText("");
-        jTextFieldNombreProducto.setText("");
-        jTextFieldPrecioProducto.setText("");
-        jComboBoxSeleccionableTipo.setSelectedIndex(0);
-        jTextFieldIngredientes.setText("");
-        jTextAreaDescripcion.setText("");
-
-        agregarIngredientes(ingredientes);
+            agregarIngredientes(ingredientes);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Debe poner un número en 'Precio'. (Ejemplo: 10.20)", "Formato erróneo", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_jButtonAceptarActionPerformed
 
-    public void agregarProducto(String rutaImagen, String nombreProducto, String precioProducto, String tipoSeleccionado, String ingredientes, String descripcion) {
-
+    public void agregarProducto(String rutaImagen, String nombreProducto, double precioProducto, String tipoSeleccionado, String ingredientes, String descripcion) {
         HttpURLConnection conexion = null;
         FileInputStream ficheroIn = null;
         try {
@@ -277,7 +280,7 @@ public class AddProducto extends javax.swing.JFrame {
             Producto p = new Producto();
             p.setImg(buff);
             p.setNombre(nombreProducto);
-            p.setPrecio(Double.parseDouble(precioProducto));
+            p.setPrecio(precioProducto);
             p.setTipo(tipoSeleccionado);
             p.setDescripcion(descripcion);
 
@@ -292,7 +295,6 @@ public class AddProducto extends javax.swing.JFrame {
             int responseCode = conexion.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 // El producto se insertó correctamente
-                JOptionPane.showMessageDialog(this, "Producto insertado correctamente", "Producto insertado", JOptionPane.WARNING_MESSAGE);
                 String response = "";
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
                     String line;
@@ -301,12 +303,8 @@ public class AddProducto extends javax.swing.JFrame {
                     }
                 }
                 idProducto = Integer.parseInt(response);
-//                System.out.println("ID PRODUCTO: " + idProducto);
-            } else {
-//                System.out.println("Error en la solicitud. Código de respuesta: " + responseCode);
+                JOptionPane.showMessageDialog(this, "Producto insertado correctamente", "Producto insertado", JOptionPane.WARNING_MESSAGE);
             }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Debe poner un número en 'Precio'. (Ejemplo: 10.20)", "Formato erróneo", JOptionPane.WARNING_MESSAGE);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -421,11 +419,7 @@ public class AddProducto extends javax.swing.JFrame {
                         response += line;
                     }
                 }
-//                System.out.println("INGREDIENTES AGREGADOS A PRODUCTO: " + idProducto);
-            } else {
-//                System.out.println("AGREGAR - Error en la solicitud. Código de respuesta: " + responseCode);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

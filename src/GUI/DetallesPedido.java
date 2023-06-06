@@ -42,8 +42,6 @@ public class DetallesPedido extends javax.swing.JFrame {
         this.comentario = comentario;
 
         estilo();
-
-        // Obtener los detalles del cliente y mostrarlos en los campos
         mostrarDetallesCliente();
     }
 
@@ -74,12 +72,14 @@ public class DetallesPedido extends javax.swing.JFrame {
     }
 
     public void mostrarDetallesCliente() {
+        HttpURLConnection conexion = null;
+        BufferedReader rd = null;
         try {
             URL direccion = new URL(urlDetallesPedido + idPedido);
-            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
             StringBuilder resultado = new StringBuilder();
             String linea;
             while ((linea = rd.readLine()) != null) {
@@ -100,6 +100,17 @@ public class DetallesPedido extends javax.swing.JFrame {
             mostrarProductosDelPedido();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
+            if (rd != null) {
+                try {
+                    rd.close();
+                } catch (Exception e) {
+                    System.out.println("Error al cerrar.");
+                }
+            }
         }
     }
 
@@ -147,7 +158,7 @@ public class DetallesPedido extends javax.swing.JFrame {
                 try {
                     rd.close();
                 } catch (Exception e) {
-                    System.out.println("Error al cerrar");
+                    System.out.println("Error al cerrar.");
                 }
             }
         }

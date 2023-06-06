@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import javax.swing.DefaultListModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -87,17 +86,6 @@ public class ListaProductos extends javax.swing.JFrame {
                     p.getNombre(),
                     p.getDescripcion(),});
             }
-
-//            DefaultListModel<String> listModel = new DefaultListModel<>();
-//            Gson gson = new Gson();
-//            ArrayList<Producto> productos = gson.fromJson(resultado.toString(), new TypeToken<ArrayList<Producto>>() {
-//            }.getType());
-//
-//            // Recorrer la lista de productos y agregar nombres a la lista
-//            for (Producto p : productos) {
-//                listModel.addElement(p.getIdProducto() + ", \t " + p.getNombre() + ", \t " + p.getDescripcion());
-//            }
-//            jListProductosAborrar.setModel(listModel); // Establecer el modelo de lista en el JList
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
