@@ -42,7 +42,7 @@ public class Main extends javax.swing.JFrame {
 
         // Iniciar el timer para actualizar la tabla en tiempo real
         timer = new Timer();
-        timer.schedule(new actualizarTablaTask(), 0, 2000); // Actualizar cada 5 segundos
+        timer.schedule(new actualizarTablaTask(), 0, 2000); // Actualizar cada 2 segundos
     }
 
     public void estiloTabla() {
@@ -65,6 +65,7 @@ public class Main extends javax.swing.JFrame {
         // Agregar el MouseAdapter para detectar el doble clic en la tabla
         try {
             jTable1.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) { // Verificar si se hizo doble clic
                         int filaSeleccionada = jTable1.getSelectedRow();
@@ -88,30 +89,26 @@ public class Main extends javax.swing.JFrame {
     }
 
     public void mostrarPedidosEnTabla() {
+        HttpURLConnection conexion = null;
+        BufferedReader rd = null;
         try {
             URL direccion = new URL(url);
-            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
             StringBuilder resultado = new StringBuilder();
             String linea;
             while ((linea = rd.readLine()) != null) {
                 resultado.append(linea);
             }
-            rd.close();
-            // Obtener el modelo de la tabla
+
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-
-            // Limpiar la tabla antes de agregar nuevos datos
             model.setRowCount(0);
-
-            // Obtener el resultado como cadena JSON
-            String json = resultado.toString();
 
             // Usar Gson para parsear el JSON en una lista de objetos Pedido
             Gson gson = new Gson();
-            ArrayList<Pedido> pedidos = gson.fromJson(json, new TypeToken<ArrayList<Pedido>>() {
+            ArrayList<Pedido> pedidos = gson.fromJson(resultado.toString(), new TypeToken<ArrayList<Pedido>>() {
             }.getType());
 
             // Recorrer la lista de pedidos y agregar filas a la tabla
@@ -125,18 +122,17 @@ public class Main extends javax.swing.JFrame {
                 });
             }
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void eliminarPedidoDeTabla(int idPedido) {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        int rowCount = model.getRowCount();
-        for (int i = 0; i < rowCount; i++) {
-            int id = (int) model.getValueAt(i, 0); // Suponiendo que la columna 0 contiene el ID del pedido
-            if (id == idPedido) {
-                model.removeRow(i);
-                break;
+            System.out.println("No se puede conectar con el servidor.");
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
+            if (rd != null) {
+                try {
+                    rd.close();
+                } catch (Exception e) {
+                    System.out.println("Error al cerrar.");
+                }
             }
         }
     }
@@ -167,6 +163,7 @@ public class Main extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jButtonCerrar = new javax.swing.JButton();
         jButtonAddProducto = new javax.swing.JButton();
+        jButtonVerProductos = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -204,6 +201,13 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
+        jButtonVerProductos.setText("Ver productos");
+        jButtonVerProductos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonVerProductosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -215,9 +219,11 @@ public class Main extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(229, 229, 229)
                 .addComponent(jButtonAddProducto)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(148, 148, 148)
+                .addComponent(jButtonVerProductos)
+                .addGap(186, 186, 186)
                 .addComponent(jButtonCerrar)
-                .addGap(236, 236, 236))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -227,7 +233,8 @@ public class Main extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonCerrar)
-                    .addComponent(jButtonAddProducto))
+                    .addComponent(jButtonAddProducto)
+                    .addComponent(jButtonVerProductos))
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -242,6 +249,11 @@ public class Main extends javax.swing.JFrame {
         AddProducto addProducto = new AddProducto();
         addProducto.setVisible(true);
     }//GEN-LAST:event_jButtonAddProductoActionPerformed
+
+    private void jButtonVerProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonVerProductosActionPerformed
+        ListaProductos lp = new ListaProductos();
+        lp.setVisible(true);
+    }//GEN-LAST:event_jButtonVerProductosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -282,6 +294,7 @@ public class Main extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAddProducto;
     private javax.swing.JButton jButtonCerrar;
+    private javax.swing.JButton jButtonVerProductos;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables

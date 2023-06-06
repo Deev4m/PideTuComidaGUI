@@ -35,9 +35,11 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="229" max="-2" attributes="0"/>
               <Component id="jButtonAddProducto" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="148" max="-2" attributes="0"/>
+              <Component id="jButtonVerProductos" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="186" max="-2" attributes="0"/>
               <Component id="jButtonCerrar" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="236" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -50,6 +52,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jButtonCerrar" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButtonAddProducto" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButtonVerProductos" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="18" max="32767" attributes="0"/>
           </Group>
@@ -125,6 +128,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonAddProductoActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButtonVerProductos">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Ver productos"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonVerProductosActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

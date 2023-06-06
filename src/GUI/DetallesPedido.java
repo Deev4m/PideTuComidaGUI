@@ -54,6 +54,7 @@ public class DetallesPedido extends javax.swing.JFrame {
         jTextAreaComentario.setLineWrap(true);
         jTextAreaComentario.setWrapStyleWord(true);
 
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null); // Se abre en el centro siempre
         getContentPane().setBackground(Color.decode("#014B10"));
         jLabel1.setForeground(Color.WHITE);
@@ -103,26 +104,23 @@ public class DetallesPedido extends javax.swing.JFrame {
     }
 
     public void mostrarProductosDelPedido() {
+        HttpURLConnection conexion = null;
+        BufferedReader rd = null;
         try {
             URL direccion = new URL(urlDetallesPedido + idPedido + "/productos");
-            HttpURLConnection conexion = (HttpURLConnection) direccion.openConnection();
+            conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+            rd = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
             StringBuilder resultado = new StringBuilder();
             String linea;
             while ((linea = rd.readLine()) != null) {
                 resultado.append(linea);
             }
-            rd.close();
 
-            // Crear el modelo de lista
             DefaultListModel<String> listModel = new DefaultListModel<>();
-
-            // Obtener el resultado como cadena JSON
-            String json = resultado.toString();
             Gson gson = new Gson();
-            ArrayList<Producto> productos = gson.fromJson(json, new TypeToken<ArrayList<Producto>>() {
+            ArrayList<Producto> productos = gson.fromJson(resultado.toString(), new TypeToken<ArrayList<Producto>>() {
             }.getType());
 
             mostrarCantidadProductos();
@@ -130,12 +128,28 @@ public class DetallesPedido extends javax.swing.JFrame {
             for (int i = 0; i < productos.size(); i++) {
                 Producto p = productos.get(i);
                 int cantidadProducto = cantidades.get(i).getCantidad();
-                listModel.addElement(p.getNombre() + " \t " + cantidadProducto);
+                if (cantidadProducto == 1) {
+                    listModel.addElement(p.getNombre() + ", " + cantidadProducto + " unidad");
+                } else {
+                    listModel.addElement(p.getNombre() + ", " + cantidadProducto + " unidades");
+                }
+
             }
             jListProductos.setModel(listModel); // Establecer el modelo de lista en el JList
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
+            if (rd != null) {
+                try {
+                    rd.close();
+                } catch (Exception e) {
+                    System.out.println("Error al cerrar");
+                }
+            }
         }
     }
 
@@ -352,26 +366,21 @@ public class DetallesPedido extends javax.swing.JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             int respuesta = conexion.getResponseCode();
-
             if (respuesta == HttpURLConnection.HTTP_OK) {
-                // El pedido se finalizó correctamente, ahora puedes eliminarlo de la tabla
-//                eliminarPedidoDeTabla();
+                System.out.println("Se finalizó correctamente el pedido.");
             } else {
-                // Ocurrió un error al finalizar el pedido, muestra un mensaje de error o realiza alguna acción apropiada
+                System.out.println("Ocurrió un error al finalizar el pedido.");
             }
             dispose();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (conexion != null) {
+                conexion.disconnect();
+            }
         }
     }//GEN-LAST:event_jButtonFinalizarActionPerformed
-//    public void eliminarPedidoDeTabla() {
-//        DefaultListModel<String> listModel = (DefaultListModel<String>) jListProductos.getModel();
-//        int indice = jListProductos.getSelectedIndex();
-//        listModel.remove(indice);
-//        jListProductos.setSelectedIndex(0); // Selecciona el primer elemento después de eliminar el pedido
-//    }
 
     /**
      * @param args the command line arguments

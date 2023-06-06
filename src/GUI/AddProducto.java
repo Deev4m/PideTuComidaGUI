@@ -51,6 +51,7 @@ public class AddProducto extends javax.swing.JFrame {
         jTextAreaDescripcion.setWrapStyleWord(true);
 
         setTitle("Añadir Producto");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null); // Se abre en el centro siempre
         // Cambiar el color de fondo a #014B10
         getContentPane().setBackground(Color.decode("#014B10"));
