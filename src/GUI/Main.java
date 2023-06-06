@@ -139,7 +139,6 @@ public class Main extends javax.swing.JFrame {
 
     // Subclase para actualizar la tabla en 'tiempo real'
     public class actualizarTablaTask extends TimerTask {
-
         @Override
         public void run() {
             SwingUtilities.invokeLater(new Runnable() {

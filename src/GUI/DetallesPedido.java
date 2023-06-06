@@ -63,7 +63,6 @@ public class DetallesPedido extends javax.swing.JFrame {
         jLabel6.setForeground(Color.WHITE);
         jLabel7.setForeground(Color.WHITE);
         jLabel8.setForeground(Color.WHITE);
-
     }
 
     public DetallesPedido() {
@@ -85,12 +84,9 @@ public class DetallesPedido extends javax.swing.JFrame {
             while ((linea = rd.readLine()) != null) {
                 resultado.append(linea);
             }
-            rd.close();
 
-            // Obtener el resultado como cadena JSON
-            String json = resultado.toString();
             Gson gson = new Gson();
-            Cliente c = gson.fromJson(json, Cliente.class);
+            Cliente c = gson.fromJson(resultado.toString(), Cliente.class);
 
             jTextFieldNombre.setText(c.getNombre());
             jTextFieldCorreo.setText(c.getCorreo());
@@ -144,10 +140,8 @@ public class DetallesPedido extends javax.swing.JFrame {
                 } else {
                     listModel.addElement(p.getNombre() + ", " + cantidadProducto + " unidades");
                 }
-
             }
             jListProductos.setModel(listModel); // Establecer el modelo de lista en el JList
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -360,7 +354,6 @@ public class DetallesPedido extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonAtrasActionPerformed
 
     private void jButtonFinalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFinalizarActionPerformed
-
         HttpURLConnection conexion = null;
         try {
             URL direccion = new URL(urlFinalizar + idPedido);

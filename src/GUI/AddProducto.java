@@ -19,8 +19,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -34,7 +32,6 @@ public class AddProducto extends javax.swing.JFrame {
     String urlInsertarProducto = "http://localhost:8080/PideTuComidaServer/resources/api/productos/insert";
     String urlInsertarIngredientes = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsert";
     String urlInsertarIngredientesAProducto = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsertEnProducto";
-    String urlVerificarIngrediente = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesVerificar/";
     int idProducto;
     ArrayList<Integer> idIngredientes;
 
@@ -63,7 +60,6 @@ public class AddProducto extends javax.swing.JFrame {
 
         // Para evitar que se redimensione la ventana al introducir una ruta
         jTextFieldRutaImagen.setPreferredSize(jTextFieldRutaImagen.getSize());
-
     }
 
     /**
@@ -222,7 +218,6 @@ public class AddProducto extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonAtrasActionPerformed
 
     private void jButtonAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAceptarActionPerformed
-
         String rutaImagen = jTextFieldRutaImagen.getText();
         String nombreProducto = jTextFieldNombreProducto.getText();
         String precioProducto = jTextFieldPrecioProducto.getText();
@@ -341,16 +336,13 @@ public class AddProducto extends javax.swing.JFrame {
                 listaIngredientes.add(in);
             }
 
-            // Convertir la lista de ingredientes a JSON
             String jsonIngredientes = gson.toJson(listaIngredientes);
-
             // Escribir los datos en la conexión y enviarlos al servidor
             try (OutputStream outputStream = conexion.getOutputStream()) {
                 byte[] input = jsonIngredientes.getBytes("utf-8");
                 outputStream.write(input, 0, input.length);
             }
 
-            // Obtener la respuesta del servidor
             int responseCode = conexion.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String response = "";
@@ -362,10 +354,6 @@ public class AddProducto extends javax.swing.JFrame {
                 }
                 idIngredientes = gson.fromJson(response, new TypeToken<ArrayList<Integer>>() {
                 }.getType());
-
-//                System.out.println("INGREDIENTES AGREGADOS: " + response);
-            } else {
-//                System.out.println("AGREGAR - Error en la solicitud. Código de respuesta: " + responseCode);
             }
             agregarIngredientesAProducto();
         } catch (Exception e) {
@@ -381,10 +369,8 @@ public class AddProducto extends javax.swing.JFrame {
         if (ingrediente == null || ingrediente.isEmpty()) {
             return "";
         }
-
         String ingredienteFormateado = ingrediente.trim();
         ingredienteFormateado = ingredienteFormateado.substring(0, 1).toUpperCase() + ingredienteFormateado.substring(1).toLowerCase();
-
         return ingredienteFormateado;
     }
 
@@ -408,10 +394,8 @@ public class AddProducto extends javax.swing.JFrame {
                 outputStream.write(input, 0, input.length);
             }
 
-            // Obtener la respuesta del servidor
             int responseCode = conexion.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Los ingredientes se insertaron correctamente
                 String response = "";
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(conexion.getInputStream()))) {
                     String line;

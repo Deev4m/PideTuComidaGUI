@@ -184,10 +184,8 @@ public class ListaProductos extends javax.swing.JFrame {
     private void jButtonBorrarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBorrarProductoActionPerformed
         int filaSeleccionda = jTable1.getSelectedRow();
         if (filaSeleccionda != -1) {
-            // Parsear el valor seleccionado para obtener el ID del producto
             int id = (int) jTable1.getValueAt(filaSeleccionda, 0);
 
-            // Realizar la petición de borrado al servidor
             HttpURLConnection conexion = null;
             try {
                 URL direccion = new URL(urlBorrarProducto + id);
