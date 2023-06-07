@@ -29,9 +29,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class AddProducto extends javax.swing.JFrame {
 
-    String urlInsertarProducto = "http://localhost:8080/PideTuComidaServer/resources/api/productos/insert";
-    String urlInsertarIngredientes = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsert";
-    String urlInsertarIngredientesAProducto = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsertEnProducto";
+    final String URL_INSERTAR_PRODUCTO = "http://localhost:8080/PideTuComidaServer/resources/api/productos/insert";
+    final String URL_INSERTAR_INGREDIENTES = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsert";
+    final String URL_INSERTAR_INGREDIENTES_A_PRODUCTO = "http://localhost:8080/PideTuComidaServer/resources/api/ingredientesInsertEnProducto";
     int idProducto;
     ArrayList<Integer> idIngredientes;
 
@@ -266,7 +266,7 @@ public class AddProducto extends javax.swing.JFrame {
                 }
             }
 
-            URL direccion = new URL(urlInsertarProducto);
+            URL direccion = new URL(URL_INSERTAR_PRODUCTO);
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("POST");
             conexion.setDoOutput(true);
@@ -320,7 +320,7 @@ public class AddProducto extends javax.swing.JFrame {
         // Lechuga, toMate,      ceboLLA, aguaCate, huevo frito, queso
         HttpURLConnection conexion = null;
         try {
-            URL direccion = new URL(urlInsertarIngredientes);
+            URL direccion = new URL(URL_INSERTAR_INGREDIENTES);
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("POST");
             conexion.setDoOutput(true);
@@ -378,7 +378,7 @@ public class AddProducto extends javax.swing.JFrame {
         // Lechuga, toMate,      ceboLLA, aguaCate, huevo frito, queso
         HttpURLConnection conexion = null;
         try {
-            URL direccion = new URL(urlInsertarIngredientesAProducto);
+            URL direccion = new URL(URL_INSERTAR_INGREDIENTES_A_PRODUCTO);
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("POST");
             conexion.setDoOutput(true);

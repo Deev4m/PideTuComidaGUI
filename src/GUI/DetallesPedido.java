@@ -24,8 +24,8 @@ import javax.swing.DefaultListModel;
  */
 public class DetallesPedido extends javax.swing.JFrame {
 
-    String urlDetallesPedido = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos/detalles_pedido/";
-    String urlFinalizar = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos/finalizarPedido/";
+    final String URL_DETALLES_PEDIDO = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos/detalles_pedido/";
+    final String URL_FINALIZAR_PEDIDO = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos/finalizarPedido/";
 
     int idPedido;
     String fecha, comentario, cantidad;
@@ -74,7 +74,7 @@ public class DetallesPedido extends javax.swing.JFrame {
         HttpURLConnection conexion = null;
         BufferedReader rd = null;
         try {
-            URL direccion = new URL(urlDetallesPedido + idPedido);
+            URL direccion = new URL(URL_DETALLES_PEDIDO + idPedido);
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
@@ -114,7 +114,7 @@ public class DetallesPedido extends javax.swing.JFrame {
         HttpURLConnection conexion = null;
         BufferedReader rd = null;
         try {
-            URL direccion = new URL(urlDetallesPedido + idPedido + "/productos");
+            URL direccion = new URL(URL_DETALLES_PEDIDO + idPedido + "/productos");
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
@@ -161,7 +161,7 @@ public class DetallesPedido extends javax.swing.JFrame {
     public String mostrarCantidadProductos() {
         HttpURLConnection conexion = null;
         try {
-            URL direccion = new URL(urlDetallesPedido + idPedido + "/productos/cantidad");
+            URL direccion = new URL(URL_DETALLES_PEDIDO + idPedido + "/productos/cantidad");
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
@@ -356,7 +356,7 @@ public class DetallesPedido extends javax.swing.JFrame {
     private void jButtonFinalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFinalizarActionPerformed
         HttpURLConnection conexion = null;
         try {
-            URL direccion = new URL(urlFinalizar + idPedido);
+            URL direccion = new URL(URL_FINALIZAR_PEDIDO + idPedido);
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("POST");
             conexion.setDoOutput(true);

@@ -23,8 +23,8 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ListaProductos extends javax.swing.JFrame {
 
-    String urlProductos = "http://localhost:8080/PideTuComidaServer/resources/api/productos";
-    String urlBorrarProducto = "http://localhost:8080/PideTuComidaServer/resources/api/productos/borrar/";
+    final String URL_PRODUCTOS = "http://localhost:8080/PideTuComidaServer/resources/api/productos";
+    final String URL_BORRAR_PRODUCTO = "http://localhost:8080/PideTuComidaServer/resources/api/productos/borrar/";
 
     /**
      * Creates new form ListaProductos
@@ -60,7 +60,7 @@ public class ListaProductos extends javax.swing.JFrame {
         HttpURLConnection conexion = null;
         BufferedReader rd = null;
         try {
-            URL direccion = new URL(urlProductos);
+            URL direccion = new URL(URL_PRODUCTOS);
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
@@ -188,7 +188,7 @@ public class ListaProductos extends javax.swing.JFrame {
 
             HttpURLConnection conexion = null;
             try {
-                URL direccion = new URL(urlBorrarProducto + id);
+                URL direccion = new URL(URL_BORRAR_PRODUCTO + id);
                 conexion = (HttpURLConnection) direccion.openConnection();
                 conexion.setRequestMethod("DELETE");
 

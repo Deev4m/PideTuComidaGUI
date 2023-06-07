@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Main extends javax.swing.JFrame {
 
-    String url = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos";
+    final String URL = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos";
     Timer timer;
 
     /**
@@ -92,7 +92,7 @@ public class Main extends javax.swing.JFrame {
         HttpURLConnection conexion = null;
         BufferedReader rd = null;
         try {
-            URL direccion = new URL(url);
+            URL direccion = new URL(URL);
             conexion = (HttpURLConnection) direccion.openConnection();
             conexion.setRequestMethod("GET");
 
@@ -139,6 +139,7 @@ public class Main extends javax.swing.JFrame {
 
     // Subclase para actualizar la tabla en 'tiempo real'
     public class actualizarTablaTask extends TimerTask {
+
         @Override
         public void run() {
             SwingUtilities.invokeLater(new Runnable() {
