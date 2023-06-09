@@ -126,7 +126,7 @@ public class Main extends javax.swing.JFrame {
         } catch (Exception e) {
             if (!errorConexion) { // Mostrar el cuadro de diálogo solo una vez
                 System.out.println("No se puede conectar con el servidor.");
-                JOptionPane.showMessageDialog(this, "No se puede conectar con el servidor", "Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No se pudo conectar con el servidor.", "Error", JOptionPane.WARNING_MESSAGE);
                 errorConexion = true; // Marcar que se ha mostrado el cuadro de diálogo
                 System.exit(0);
             }
