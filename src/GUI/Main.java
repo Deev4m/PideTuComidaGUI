@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -31,6 +32,7 @@ public class Main extends javax.swing.JFrame {
 
     final String URL = "http://localhost:8080/PideTuComidaServer/resources/api/pedidos";
     Timer timer;
+    boolean errorConexion = false;
 
     /**
      * Creates new form Main
@@ -122,7 +124,11 @@ public class Main extends javax.swing.JFrame {
                 });
             }
         } catch (Exception e) {
-            System.out.println("No se puede conectar con el servidor.");
+            if (!errorConexion) { // Mostrar el cuadro de diálogo solo una vez
+                System.out.println("No se puede conectar con el servidor.");
+                JOptionPane.showMessageDialog(this, "No se puede conectar con el servidor", "Error", JOptionPane.WARNING_MESSAGE);
+                errorConexion = true; // Marcar que se ha mostrado el cuadro de diálogo
+            }
         } finally {
             if (conexion != null) {
                 conexion.disconnect();
